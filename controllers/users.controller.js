@@ -27,10 +27,8 @@ const usersGet = async (req = request, res = response) => {
 
   // Run both promises simultaneously
   const [total, users] = await Promise.all([
-    User.countDocuments({status: true}),
-    User.find({status: true})
-      .skip(from)
-      .limit(limit)
+    User.countDocuments({ status: true }),
+    User.find({ status: true }).skip(from).limit(limit),
   ]);
 
   res.status(200).json({
@@ -55,17 +53,16 @@ const usersPut = async (req = request, res = response) => {
   res.json(user);
 };
 
-const usersDelete = async(req = request, res = response) => {
+const usersDelete = async (req = request, res = response) => {
+  const { id } = req.params;
 
-  const {id} = req.params;
-
-  // Hard Delete
+  // Hard Delete | JUST AN EXAMPLE
   // const user = await User.findByIdAndDelete(id);
 
-  const user = await User.findByIdAndUpdate(id, {status: false});
+  const user = await User.findByIdAndUpdate(id, { status: false });
 
   res.json({
-    user
+    user,
   });
 };
 

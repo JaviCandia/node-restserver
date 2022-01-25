@@ -1,14 +1,14 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
-const { validateFields } = require("../middlewares/validate-fields");
+
+// const { validateFields } = require("../middlewares/validate-fields");
+// const { validateJWT } = require("../middlewares/validate-jwt");
+// const { isAdminRole, hasRole } = require("../middlewares/validate-roles");
+const { validateFields, validateJWT, isAdminRole, hasRole } = require('../middlewares');
+
 const { isValidRole, emailExist, userExistsById } = require("../helpers/db-validators");
-const {
-  usersPost,
-  usersGet,
-  usersPut,
-  usersDelete,
-  usersPatch,
-} = require("../controllers/users.controller");
+const { usersPost, usersGet, usersPut, usersDelete, usersPatch } = require("../controllers/users.controller");
+
 const router = Router();
 
 router.post(
@@ -36,6 +36,9 @@ router.put("/:id", [
 ], usersPut);
 
 router.delete("/:id", [
+  validateJWT,
+  // isAdminRole,
+  hasRole('ADMIN_ROLE', 'USER_ROLE'),
   check('id', 'Invalid MongoDB ID').isMongoId(),
   check('id').custom(userExistsById),
   validateFields
