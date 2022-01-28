@@ -34,7 +34,9 @@
 
         const body = { id_token: response.credential };
 
-        fetch("http://localhost:4000/api/auth/google", {
+        // For dev change the following line to
+        // http://localhost:4000/api/auth/google
+        fetch("https://node-restserver-jch.herokuapp.com/", {
           method: "POST",
           headers: {
             "Content-type": "application/json",
