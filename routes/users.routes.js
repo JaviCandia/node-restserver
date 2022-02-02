@@ -4,10 +4,25 @@ const { check } = require("express-validator");
 // const { validateFields } = require("../middlewares/validate-fields");
 // const { validateJWT } = require("../middlewares/validate-jwt");
 // const { isAdminRole, hasRole } = require("../middlewares/validate-roles");
-const { validateFields, validateJWT, isAdminRole, hasRole } = require('../middlewares');
+const {
+  validateFields,
+  validateJWT,
+  isAdminRole,
+  hasRole,
+} = require("../middlewares");
 
-const { isValidRole, emailExist, userExistsById } = require("../helpers/db-validators");
-const { usersPost, usersGet, usersPut, usersDelete, usersPatch } = require("../controllers/users.controller");
+const {
+  isValidRole,
+  emailExists,
+  userNotFound,
+} = require("../helpers/db-validators");
+const {
+  createUser,
+  getUser,
+  updateUser,
+  patchUser,
+  deleteUser,
+} = require("../controllers/users.controller");
 
 const router = Router();
 
@@ -19,31 +34,39 @@ router.post(
       min: 6,
     }),
     check("email", "Invalid email format").isEmail(),
-    check("email").custom(emailExist),
+    check("email").custom(emailExists),
     check("role").custom(isValidRole),
     validateFields,
   ],
-  usersPost
+  createUser
 );
 
-router.get("/", usersGet);
+router.get("/", getUser);
 
-router.put("/:id", [
-  check('id', 'Invalid MongoDB ID').isMongoId(),
-  check('id').custom(userExistsById),
-  check('role').custom(isValidRole),
-  validateFields
-], usersPut);
+router.put(
+  "/:id",
+  [
+    check("id", "Invalid MongoDB ID").isMongoId(),
+    check("id").custom(userNotFound),
+    check("role").custom(isValidRole),
+    validateFields,
+  ],
+  updateUser
+);
 
-router.delete("/:id", [
-  validateJWT,
-  // isAdminRole,
-  hasRole('ADMIN_ROLE', 'USER_ROLE'),
-  check('id', 'Invalid MongoDB ID').isMongoId(),
-  check('id').custom(userExistsById),
-  validateFields
-],usersDelete);
+router.delete(
+  "/:id",
+  [
+    validateJWT,
+    // isAdminRole,
+    hasRole("ADMIN_ROLE", "USER_ROLE"),
+    check("id", "Invalid MongoDB ID").isMongoId(),
+    check("id").custom(userNotFound),
+    validateFields,
+  ],
+  deleteUser
+);
 
-router.patch("/:id", usersPatch);
+router.patch("/:id", patchUser);
 
 module.exports = router;

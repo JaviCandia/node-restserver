@@ -2,7 +2,7 @@ const { response, request } = require("express");
 const User = require("../models/User.model");
 const bcryptjs = require("bcryptjs");
 
-const usersPost = async (req = request, res = response) => {
+const createUser = async (req = request, res = response) => {
   const { name, email, password, role } = req.body;
   const user = new User({ name, email, password, role });
 
@@ -18,7 +18,7 @@ const usersPost = async (req = request, res = response) => {
   });
 };
 
-const usersGet = async (req = request, res = response) => {
+const getUser = async (req = request, res = response) => {
   const { from = 0, limit = 5 } = req.query;
   // const users = await User.find({status: true})
   //   .skip(from)
@@ -37,7 +37,7 @@ const usersGet = async (req = request, res = response) => {
   });
 };
 
-const usersPut = async (req = request, res = response) => {
+const updateUser = async (req = request, res = response) => {
   const { id } = req.params;
   const { _id, password, google, ...rest } = req.body;
 
@@ -48,34 +48,34 @@ const usersPut = async (req = request, res = response) => {
     rest.password = bcryptjs.hashSync(password, salt);
   }
 
-  const user = await User.findByIdAndUpdate(id, rest);
+  const user = await User.findByIdAndUpdate(id, rest, {new: true});
 
   res.json(user);
 };
 
-const usersDelete = async (req = request, res = response) => {
-  const { id } = req.params;
-
-  // Hard Delete | JUST AN EXAMPLE
-  // const user = await User.findByIdAndDelete(id);
-
-  const user = await User.findByIdAndUpdate(id, { status: false });
-
-  res.json({
-    user,
-  });
-};
-
-const usersPatch = (req = request, res = response) => {
+const patchUser = (req = request, res = response) => {
   res.json({
     msg: "patch api - usersPatch",
   });
 };
 
+const deleteUser = async (req = request, res = response) => {
+  const { id } = req.params;
+
+  // Hard Delete | JUST AN EXAMPLE
+  // const user = await User.findByIdAndDelete(id);
+
+  const deletedUser = await User.findByIdAndUpdate(id, { status: false }, {new: true});
+
+  res.json({
+    deletedUser,
+  });
+};
+
 module.exports = {
-  usersPost,
-  usersGet,
-  usersPut,
-  usersDelete,
-  usersPatch,
+  createUser,
+  getUser,
+  updateUser,
+  patchUser,
+  deleteUser,
 };
